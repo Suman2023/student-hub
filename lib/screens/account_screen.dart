@@ -88,42 +88,43 @@ class AccountScreen extends ConsumerWidget {
                                     "Signedin with ${emailcontroller.text} and ${passcontroller.text}",
                                   );
 
-                                  final response = await ref
-                                      .read(accountDbHelperProvider)
-                                      .getCred(emailcontroller.text);
-                                  print("Response: $response");
-                                  if (response != null) {
-                                    await ref
-                                        .read(accountServiceProvider)
-                                        .signin(
-                                          email: emailcontroller.text,
-                                          password: passcontroller.text,
-                                          csrftoken: response['csrftoken'],
+                                  // final response = await ref
+                                  //     .read(accountDbHelperProvider)
+                                  //     .getCred(emailcontroller.text);
+                                  // print("Response: $response");
+                                  // if (response != null) {
+                                  final data = await ref
+                                      .read(accountServiceProvider)
+                                      .signup(
+                                        email: emailcontroller.text,
+                                        password: passcontroller.text,
+                                      );
+                                  // TODO: use the below for signup
+                                  if (data != null) {
+                                    final id = await ref
+                                        .read(accountDbHelperProvider)
+                                        .saveCred(
+                                          data.email,
+                                          data.password,
+                                          data.csrftoken,
+                                          data.sessionid
                                         );
-                                    // TODO: use the below for signup
-                                    // if (response != null) {
-                                    //   final id = await ref
-                                    //       .read(accountDbHelperProvider)
-                                    //       .saveCred(
-                                    //           response.email,
-                                    //           response.password,
-                                    //           response.csrftoken);
-                                    //   debugPrint("ID: $id");
-                                    // }
+                                    debugPrint("ID: $id");
                                   }
                                 },
-                                child: const Text("Sign In"),
+                                // },
+                                child: const Text("Sign Up"),
                               ),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text("No account? "),
+                                  Text("Already Have an account? "),
                                   GestureDetector(
                                     onTap: () {
                                       debugPrint("tapped register");
                                     },
                                     child: Text(
-                                      "register",
+                                      "login",
                                       style: TextStyle(color: Colors.blue),
                                     ),
                                   ),

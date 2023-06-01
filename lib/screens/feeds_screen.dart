@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:student_hub/screens/add_post_screen.dart';
 
 import '../widgets/feed_post.dart';
 
@@ -16,7 +17,10 @@ class FeedsScreen extends ConsumerWidget {
           borderRadius: BorderRadius.circular(100),
         ),
         backgroundColor: Colors.blue[300],
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => AddPostScreen()));
+        },
         child: const FaIcon(FontAwesomeIcons.penNib),
       ),
       body: NestedScrollView(

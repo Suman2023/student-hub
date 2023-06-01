@@ -1,4 +1,4 @@
-package me.sumanmitra.studenthub.student_hub
+package me.sumanmitra.studenthub
 
 import io.flutter.embedding.android.FlutterActivity
 
