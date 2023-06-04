@@ -5,10 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:student_hub/providers/feed_screen_providers.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
-import '../providers/accounts_screen_providers.dart';
+import '../database/account_db_helper.dart';
 
 class AddPostScreen extends StatefulWidget {
   const AddPostScreen({super.key});
@@ -32,36 +31,22 @@ class _AddPostScreenState extends State<AddPostScreen> {
             return TextButton(
                 onPressed: () async {
                   ref.read(postInProgressStateProvider.notifier).state = true;
-                  String? downloadurl;
                   if (imagefile != null || _textController.text.isNotEmpty) {
                     // TODO : show a loading with a blurred bg and when done take them to home with refresh
                     try {
-                      final authdetails = await ref
-                          .read(accountDbHelperProvider)
-                          .getCurrentUserCred();
+                      final authdetails = await AccountDbHelper.getCurrentUserCred();
                       if (authdetails == null) {
                         throw Exception("No User found.. Signin again");
                       }
-                      String username = authdetails['email'];
-                      String filename = username.split("@")[0] +
-                          DateTime.now().toIso8601String();
-                      if (imagefile != null) {
-                        final data = await storage.ref(filename).putFile(
-                            imagefile,
-                            SettableMetadata(customMetadata: {
-                              'uploaded_by': 'Username',
-                              'description': 'Some description...'
-                            }));
-                        downloadurl = await data.ref.getDownloadURL();
-                      }
                       debugPrint(authdetails['csrftoken']);
-                      final success =
-                          await ref.read(feedServiceProvider).addPost(
-                                text: _textController.text,
-                                imageurl: downloadurl ?? "",
-                                csrftoken: authdetails['csrftoken'],
-                                sessionid: authdetails['sessionid'],
-                              );
+                      final success = await ref
+                          .read(feedServiceProvider)
+                          .addPost(
+                            text: _textController.text,
+                            imagefile: imagefile, // This will need to be a file
+                            csrftoken: authdetails['csrftoken'],
+                            sessionid: authdetails['sessionid'],
+                          );
                       if (success) {
                         ref.read(postInProgressStateProvider.notifier).state =
                             false;
@@ -77,8 +62,6 @@ class _AddPostScreenState extends State<AddPostScreen> {
                     } catch (e) {
                       debugPrint("SOmething went wrong while posting: $e");
                     }
-
-                    debugPrint("The url for the upload is: $downloadurl");
                   }
                 },
                 child: loading

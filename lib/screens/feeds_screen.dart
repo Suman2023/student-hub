@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:student_hub/providers/feed_screen_providers.dart';
 import 'package:student_hub/screens/add_post_screen.dart';
 
 import '../widgets/feed_post.dart';
@@ -11,6 +12,7 @@ class FeedsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     Size size = MediaQuery.of(context).size;
+    final timelinefeeds = ref.watch(timelineFeedsProvider);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         shape: RoundedRectangleBorder(
@@ -39,24 +41,45 @@ class FeedsScreen extends ConsumerWidget {
         },
         // list of images for scrolling
         body: RefreshIndicator(
-          onRefresh: () {
-            return Future.delayed(const Duration(seconds: 1));
-          },
-          child: ListView.builder(
-            itemCount: 100,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: FeedPostWidget(
-                  width: size.width,
-                  text: "Hello this is a pic",
-                  imgurl:
-                      "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fc.pxhere.com%2Fphotos%2F23%2Fe9%2Fpeople_portrait_child_poverty_male_black_and_white_looking_eyes-543713.jpg!d&f=1&nofb=1&ipt=44c4e0a5b76abf57b5d0f9b37a2c85669d26b1fdff5ccafddb5d9f1cbd11d7e4&ipo=images",
-                ),
-              );
-            },
-          ),
-        ),
+            onRefresh: () => ref.refresh(timelineFeedsProvider.future),
+            child: timelinefeeds.when(
+                data: (data) {
+                  debugPrint(data[0].likedByme.toString());
+                  return data.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text("No Post Found please Refresh"),
+                              IconButton(
+                                  onPressed: () =>
+                                      ref.refresh(timelineFeedsProvider.future),
+                                  icon: Icon(Icons.refresh))
+                            ],
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: data.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: FeedPostWidget(
+                                width: size.width,
+                                id: data[index].id,
+                                text: data[index].text,
+                                imgurl: data[index].imageurl,
+                                totalLike: data[index].totalLike,
+                                likedByme: data[index].likedByme,
+                              ),
+                            );
+                          },
+                        );
+                },
+                error: (stk, obj) => Container(child: Text("")),
+                loading: () => Center(
+                      child: CircularProgressIndicator(),
+                    ))),
       ),
     );
   }
