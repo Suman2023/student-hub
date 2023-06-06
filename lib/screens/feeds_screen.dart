@@ -21,7 +21,7 @@ class FeedsScreen extends ConsumerWidget {
         backgroundColor: Colors.blue[300],
         onPressed: () {
           Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => AddPostScreen()));
+              .push(MaterialPageRoute(builder: (context) => const AddPostScreen()));
         },
         child: const FaIcon(FontAwesomeIcons.penNib),
       ),
@@ -35,7 +35,7 @@ class FeedsScreen extends ConsumerWidget {
               // expandedHeight: 0,
               floating: true,
               snap: true,
-              backgroundColor: Colors.red,
+              backgroundColor: Colors.white,
             )
           ];
         },
@@ -44,17 +44,17 @@ class FeedsScreen extends ConsumerWidget {
             onRefresh: () => ref.refresh(timelineFeedsProvider.future),
             child: timelinefeeds.when(
                 data: (data) {
-                  debugPrint(data[0].likedByme.toString());
+                  // debugPrint(data[0].likedByme.toString());
                   return data.isEmpty
                       ? Center(
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text("No Post Found please Refresh"),
+                              const Text("No Post Found please Refresh"),
                               IconButton(
                                   onPressed: () =>
                                       ref.refresh(timelineFeedsProvider.future),
-                                  icon: Icon(Icons.refresh))
+                                  icon: const Icon(Icons.refresh))
                             ],
                           ),
                         )
@@ -76,8 +76,8 @@ class FeedsScreen extends ConsumerWidget {
                           },
                         );
                 },
-                error: (stk, obj) => Container(child: Text("")),
-                loading: () => Center(
+                error: (stk, obj) => Container(child: const Text("")),
+                loading: () => const Center(
                       child: CircularProgressIndicator(),
                     ))),
       ),

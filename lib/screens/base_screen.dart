@@ -13,7 +13,7 @@ class BaseScreen extends ConsumerWidget {
 
   final _pages = [
     const FeedsScreen(text: "1"),
-    const ArticlesScreen(),
+    ArticlesScreen(),
     const VideoesScreen(),
     const TestScreen(),
     const AccountScreen(),

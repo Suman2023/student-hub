@@ -6,8 +6,16 @@ import 'package:student_hub/models/feeds_timeline_model.dart';
 import '../database/account_db_helper.dart';
 
 class FeedService {
-  final Dio _dio = Dio();
-  final String BASE_URL = "http://10.0.2.2:8000/feeds";
+  Dio? _dio;
+
+  FeedService() {
+    BaseOptions options = BaseOptions(
+      baseUrl:
+          "https://f4be-2405-201-a80e-d822-d1fa-7a43-ba11-28e2.ngrok-free.app/feeds",
+      connectTimeout: const Duration(seconds: 5),
+    );
+    _dio ??= Dio(options);
+  }
 
   Future<bool> addPost({
     String? text,
@@ -26,7 +34,7 @@ class FeedService {
         "text": text
       });
 
-      final response = await _dio.post("$BASE_URL/addpost/",
+      final response = await _dio!.post("/addpost/",
           data: formData,
           options: Options(headers: {
             'Cookie': "csrftoken=$csrftoken; sessionid=$sessionid",
@@ -42,47 +50,53 @@ class FeedService {
   }
 
   Future<List<FeedsTimeline>> getMyTimeline() async {
-    final authdetails = await AccountDbHelper.getCurrentUserCred();
     List<FeedsTimeline> result = [];
-    if (authdetails != null) {
-      final csrftoken = authdetails["csrftoken"],
-          sessionid = authdetails["sessionid"];
-      final response = await _dio.get(
-        "$BASE_URL/timelineposts",
-        options: Options(
-          headers: {
-            'Cookie': "csrftoken=$csrftoken; sessionid=$sessionid",
-            'X-CSRFToken': csrftoken
-          },
-        ),
-      );
-      for (var post in response.data) {
-        result.add(
-          FeedsTimeline(
-            id: post['id'],
-            text: post["text"],
-            imageurl: post["imageurl"],
-            totalLike: post["total_like"],
-            likedByme: post["liked_byme"],
-            createdAt: DateTime.parse(post["createdAt"]),
-            updatedAt: DateTime.parse(post["updatedAt"]),
+    try {
+      final authdetails = await AccountDbHelper.getCurrentUserCred();
+
+      if (authdetails != null) {
+        final csrftoken = authdetails["csrftoken"],
+            sessionid = authdetails["sessionid"];
+        final response = await _dio!.get(
+          "/timelineposts",
+          options: Options(
+            headers: {
+              'Cookie': "csrftoken=$csrftoken; sessionid=$sessionid",
+              'X-CSRFToken': csrftoken
+            },
+            receiveTimeout: const Duration(seconds: 5),
           ),
         );
+        for (var post in response.data) {
+          result.add(
+            FeedsTimeline(
+              id: post['id'],
+              text: post["text"],
+              imageurl: post["imageurl"],
+              totalLike: post["total_like"],
+              likedByme: post["liked_byme"],
+              createdAt: DateTime.parse(post["createdAt"]),
+              updatedAt: DateTime.parse(post["updatedAt"]),
+            ),
+          );
+        }
       }
+    } catch (e) {
+      print("Something went wrong in getMyTimeline: $e");
     }
+
     return result;
   }
 
-  Future<void> favouritePost({required int postid, required bool favourite}) async {
+  Future<void> favouritePost(
+      {required int postid, required bool favourite}) async {
     final authdetails = await AccountDbHelper.getCurrentUserCred();
     if (authdetails != null) {
       final csrftoken = authdetails["csrftoken"],
           sessionid = authdetails["sessionid"];
-      await _dio.post(
-        "$BASE_URL/favouritepost/$postid",
-        data: {
-          "favourite": favourite
-        },
+      await _dio!.post(
+        "/favouritepost/$postid",
+        data: {"favourite": favourite},
         options: Options(
           headers: {
             'Cookie': "csrftoken=$csrftoken; sessionid=$sessionid",

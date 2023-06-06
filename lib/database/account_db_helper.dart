@@ -23,13 +23,19 @@ class AccountDbHelper {
     );
   }
 
-  Future<int> saveCred(String email, String password, String csrftoken, String sessionid) async {
+  Future<int> saveCred(
+      String email, String password, String csrftoken, String sessionid) async {
     final db = await AccountDbHelper.db();
     await db.rawDelete("DELETE FROM account");
-    final data = {'email': email, 'password': password, 'csrftoken': csrftoken, 'sessionid': sessionid};
+    final data = {
+      'email': email,
+      'password': password,
+      'csrftoken': csrftoken,
+      'sessionid': sessionid
+    };
     final id = await db.insert('account', data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
-    
+
     return id;
   }
 
@@ -55,6 +61,22 @@ class AccountDbHelper {
     return result;
   }
 
+  static Future<bool> clearAccountTable() async {
+    try {
+      final db = await AccountDbHelper.db();
+      await db.rawDelete("DELETE FROM account");
+      return true;
+    } catch (e) {
+      print("SOmething went Wrong in clearAccountTable: $e");
+    }
+    return false;
+  }
+
+  static getAllCred() async {
+    final db = await AccountDbHelper.db();
+    final data = await db.rawQuery("SELECT * FROM account");
+    print(data);
+  }
   // // Update an item by id
   // static Future<int> updateItem(
   //     int id, String title, String? descrption) async {
