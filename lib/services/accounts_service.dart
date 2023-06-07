@@ -4,9 +4,16 @@ import 'package:student_hub/models/user_auth_model.dart';
 import '../database/account_db_helper.dart';
 
 class AcountService {
-  final Dio _dio = Dio();
-  final String BASE_URL = "https://f4be-2405-201-a80e-d822-d1fa-7a43-ba11-28e2.ngrok-free.app/accounts";
-// Sign in the user
+  Dio? _dio;
+
+  AcountService() {
+    BaseOptions options = BaseOptions(
+      baseUrl:
+          "https://20d3-2405-201-a80e-d829-1c5c-54af-bff8-76bb.ngrok-free.app/accounts",
+      connectTimeout: const Duration(seconds: 5),
+    );
+    _dio ??= Dio(options);
+  }
 
   Future<UserAuthResponse> signin(
       {required String email,
@@ -14,7 +21,7 @@ class AcountService {
       String? csrftoken}) async {
     String? newcsrf, newsessionid;
     try {
-      final result = await _dio.postUri(Uri.parse('$BASE_URL/signin/'),
+      final result = await _dio!.post("/signin/",
           data: {
             "email": email,
             "password": password,
@@ -31,6 +38,9 @@ class AcountService {
           newsessionid = element.split(";")[0].split("=")[1];
         }
       }
+      if (newcsrf != null && newsessionid != null) {
+        await AccountDbHelper.saveCred(email, password, newcsrf, newsessionid);
+      }
     } catch (e) {
       print("Error in signin $e");
     }
@@ -45,8 +55,8 @@ class AcountService {
   Future<UserAuthResponse?> signup(
       {required String email, required String password}) async {
     try {
-      final result = await _dio.postUri(
-        Uri.parse('$BASE_URL/signup/'),
+      final result = await _dio!.post(
+        "/signup/",
         data: {
           "email": email,
           "password": password,
@@ -70,8 +80,8 @@ class AcountService {
 
     final csrftoken = authdetails!["csrftoken"],
         sessionid = authdetails["sessionid"];
-    final response = await _dio.get(
-      "$BASE_URL/signout",
+    final response = await _dio!.get(
+      "/signout",
       options: Options(
         headers: {
           'Cookie': "csrftoken=$csrftoken; sessionid=$sessionid",
@@ -87,5 +97,18 @@ class AcountService {
   Future<Map<String, dynamic>?> isAuthenticated() async {
     final auth = await AccountDbHelper.getCurrentUserCred();
     return auth;
+  }
+
+  static bool validateEmail(String email) {
+    const pattern = r'^[\w-]+(\.[\w-]+)*@([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$';
+    final regex = RegExp(pattern);
+    return regex.hasMatch(email);
+  }
+
+  static bool validatePassword(String password) {
+    const pattern =
+        r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$';
+    final regex = RegExp(pattern);
+    return regex.hasMatch(password);
   }
 }

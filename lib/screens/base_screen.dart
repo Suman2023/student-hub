@@ -8,26 +8,41 @@ import 'package:student_hub/screens/feeds_screen.dart';
 import 'package:student_hub/screens/test_screen.dart';
 import 'package:student_hub/screens/videoes_screen.dart';
 
-class BaseScreen extends ConsumerWidget {
-  BaseScreen({super.key});
+import '../providers/accounts_screen_providers.dart';
 
-  final _pages = [
-    const FeedsScreen(text: "1"),
-    ArticlesScreen(),
-    const VideoesScreen(),
-    const TestScreen(),
-    const AccountScreen(),
-  ];
+class BaseScreen extends ConsumerStatefulWidget {
+  const BaseScreen({super.key, this.data});
+  final Map<String, dynamic>? data;
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => _BaseScreenState();
+}
+
+class _BaseScreenState extends ConsumerState<BaseScreen> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  List<Widget> getPages(int accountPage) {
+    return [
+      const FeedsScreen(text: "1"),
+      ArticlesScreen(),
+      const VideoesScreen(),
+      const TestScreen(),
+      const AccountScreen(),
+    ];
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final navigationCurrentIndex = ref.watch(navigationBarIndexStateProvider);
     final pageController = ref.watch(pageViewControllerProvider);
+    final isLoggedIn = ref.watch(isLoggedInStateProvider);
     return Scaffold(
       body: PageView(
         physics: const NeverScrollableScrollPhysics(),
         controller: pageController,
-        children: _pages,
+        children: getPages(isLoggedIn ? 0 : 1),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: navigationCurrentIndex,

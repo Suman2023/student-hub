@@ -11,7 +11,7 @@ class FeedService {
   FeedService() {
     BaseOptions options = BaseOptions(
       baseUrl:
-          "https://f4be-2405-201-a80e-d822-d1fa-7a43-ba11-28e2.ngrok-free.app/feeds",
+          "https://20d3-2405-201-a80e-d829-1c5c-54af-bff8-76bb.ngrok-free.app/feeds",
       connectTimeout: const Duration(seconds: 5),
     );
     _dio ??= Dio(options);

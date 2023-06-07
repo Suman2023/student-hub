@@ -18,10 +18,21 @@ final passControllerProvider =
     StateProvider<TextEditingController>((ref) => TextEditingController());
 final showPassStateProvider = StateProvider<bool>((ref) => false);
 
-final authSignLoadingStateProvider = StateProvider<bool>((ref)=>false);
+final authSignLoadingStateProvider = StateProvider<bool>((ref) => false);
 
 
-final isAuthenticatedProvider = FutureProvider<Map<String, dynamic>?>((ref) async {
+
+final invalidEmailStateProvider = StateProvider<String?>((ref) => null);
+final invalidPwdStateProvider = StateProvider<String?>((ref) => null);
+
+final isAuthenticatedProvider =
+    FutureProvider<Map<String, dynamic>?>((ref) async {
   final authservice = ref.read(accountServiceProvider);
-  return await authservice.isAuthenticated();
+  final data = await authservice.isAuthenticated();
+  if(data != null){
+      ref.read(isLoggedInStateProvider.notifier).state = true;
+  }
+  return data;
 });
+
+final isLoggedInStateProvider = StateProvider<bool>((ref)=>false);

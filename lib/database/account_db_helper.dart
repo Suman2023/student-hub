@@ -23,7 +23,7 @@ class AccountDbHelper {
     );
   }
 
-  Future<int> saveCred(
+  static Future<int> saveCred(
       String email, String password, String csrftoken, String sessionid) async {
     final db = await AccountDbHelper.db();
     await db.rawDelete("DELETE FROM account");
@@ -35,6 +35,7 @@ class AccountDbHelper {
     };
     final id = await db.insert('account', data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
+    print("Saved Cred with id: $id");
 
     return id;
   }
