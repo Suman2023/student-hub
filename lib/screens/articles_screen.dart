@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:student_hub/models/articles_models.dart';
@@ -63,21 +64,41 @@ class ArticlesScreen extends ConsumerWidget {
                     child: Row(
                       children: [
                         Container(
-                          decoration: const BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.horizontal(
+                          decoration: BoxDecoration(
+                            color: Colors.blueGrey[100],
+                            borderRadius: const BorderRadius.horizontal(
                               left: Radius.circular(10),
                             ),
                           ),
                           width: size.width / 4,
                           child: ClipRRect(
-                              borderRadius: BorderRadius.horizontal(
+                              borderRadius: const BorderRadius.horizontal(
                                 left: Radius.circular(10),
                               ),
-                              child: Image.network(
-                                articles[index].imageurl,
+                              child: CachedNetworkImage(
+                                imageUrl: articles[index].imageurl,
+                                placeholder: (context, str) => AspectRatio(
+                                  aspectRatio:
+                                      (size.width / 4) / (size.height / 6),
+                                  child: Container(
+                                    color: Colors.blueGrey[100],
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) =>
+                                    AspectRatio(
+                                  aspectRatio:
+                                      (size.width / 4) / (size.height / 6),
+                                  child: const Center(
+                                    child: Text("Something went Wrong"),
+                                  ),
+                                ),
                                 fit: BoxFit.fill,
-                              )),
+                              )
+                              // Image.network(
+                              //   articles[index].imageurl,
+                              //   fit: BoxFit.fill,
+                              // ),
+                              ),
                         ),
                         const SizedBox(
                           width: 5,

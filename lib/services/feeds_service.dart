@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:student_hub/models/feeds_timeline_model.dart';
 
 import '../database/account_db_helper.dart';
@@ -11,7 +12,7 @@ class FeedService {
   FeedService() {
     BaseOptions options = BaseOptions(
       baseUrl:
-          "https://20d3-2405-201-a80e-d829-1c5c-54af-bff8-76bb.ngrok-free.app/feeds",
+          "${dotenv.env['BASE_URL']}/feeds",
       connectTimeout: const Duration(seconds: 5),
     );
     _dio ??= Dio(options);
@@ -71,6 +72,9 @@ class FeedService {
           result.add(
             FeedsTimeline(
               id: post['id'],
+              username: post['username'],
+              first_name: post['first_name'],
+              aspectratio: post['aspectratio'],
               text: post["text"],
               imageurl: post["imageurl"],
               totalLike: post["total_like"],

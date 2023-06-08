@@ -66,17 +66,13 @@ class FeedsScreen extends ConsumerWidget {
                                   const EdgeInsets.symmetric(horizontal: 8.0),
                               child: FeedPostWidget(
                                 width: size.width,
-                                id: data[index].id,
-                                text: data[index].text,
-                                imgurl: data[index].imageurl,
-                                totalLike: data[index].totalLike,
-                                likedByme: data[index].likedByme,
+                                data: data[index]
                               ),
                             );
                           },
                         );
                 },
-                error: (stk, obj) => Container(child: const Text("")),
+                error: (stk, obj) => const Text(""),
                 loading: () => const Center(
                       child: CircularProgressIndicator(),
                     ))),

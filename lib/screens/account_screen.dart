@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:student_hub/providers/accounts_screen_providers.dart';
@@ -192,21 +190,13 @@ class SignInFlow extends ConsumerWidget {
               onPressed: isLoading
                   ? null
                   : () async {
-                      debugPrint("Hello");
                       final validEmail =
                           AcountService.validateEmail(emailcontroller.text);
-                      final validPass = true;
-                      // AcountService.validatePassword(passcontroller.text);
                       if (!validEmail) {
                         ref.read(invalidEmailStateProvider.notifier).state =
                             "Invalid Email";
                       }
-                      // if (!validPass) {
-                      //   ref.read(invalidPwdStateProvider.notifier).state =
-                      //       "Weak Password";
-                      // }
-                      print("$validEmail,$validPass");
-                      if (validEmail && validPass) {
+                      if (validEmail && passcontroller.text.isNotEmpty) {
                         ref.read(authSignLoadingStateProvider.notifier).state =
                             true;
                         final response = await ref

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:student_hub/providers/accounts_screen_providers.dart';
 import 'package:student_hub/screens/base_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
+    await dotenv.load(fileName: ".env"); 
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(
@@ -39,16 +41,16 @@ class MyApp extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text("Something went wrong. Please refresh!"),
+                const Text("Something went wrong. Please refresh!"),
                 IconButton(
                   onPressed: () => ref.refresh(isAuthenticatedProvider.future),
-                  icon: Icon(Icons.refresh),
+                  icon: const Icon(Icons.refresh),
                 ),
               ],
             ),
           ),
         ),
-        loading: () => Scaffold(
+        loading: () => const Scaffold(
           body: Center(
             child: CircularProgressIndicator(),
           ),

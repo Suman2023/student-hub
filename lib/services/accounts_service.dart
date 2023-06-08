@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:student_hub/models/user_auth_model.dart';
 
 import '../database/account_db_helper.dart';
@@ -9,7 +10,7 @@ class AcountService {
   AcountService() {
     BaseOptions options = BaseOptions(
       baseUrl:
-          "https://20d3-2405-201-a80e-d829-1c5c-54af-bff8-76bb.ngrok-free.app/accounts",
+          "${dotenv.env['BASE_URL']}/accounts",
       connectTimeout: const Duration(seconds: 5),
     );
     _dio ??= Dio(options);

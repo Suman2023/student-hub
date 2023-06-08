@@ -41,7 +41,7 @@ class AccountDbHelper {
   }
 
   Future<Map<String, dynamic>?> getCred(String email) async {
-    var result;
+    Map<String, dynamic>? result;
     final db = await AccountDbHelper.db();
     final response = await db.query('account',
         where: "email = ?", whereArgs: [email], limit: 1);

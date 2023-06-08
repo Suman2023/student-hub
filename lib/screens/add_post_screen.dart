@@ -30,11 +30,14 @@ class _AddPostScreenState extends State<AddPostScreen> {
             final loading = ref.watch(postInProgressStateProvider);
             return TextButton(
                 onPressed: () async {
-                  ref.read(postInProgressStateProvider.notifier).state = true;
                   if (imagefile != null || _textController.text.isNotEmpty) {
+                    FocusScope.of(context).unfocus();
+                    ref.read(postInProgressStateProvider.notifier).state = true;
+
                     // TODO : show a loading with a blurred bg and when done take them to home with refresh
                     try {
-                      final authdetails = await AccountDbHelper.getCurrentUserCred();
+                      final authdetails =
+                          await AccountDbHelper.getCurrentUserCred();
                       if (authdetails == null) {
                         throw Exception("No User found.. Signin again");
                       }
@@ -50,14 +53,28 @@ class _AddPostScreenState extends State<AddPostScreen> {
                       if (success) {
                         ref.read(postInProgressStateProvider.notifier).state =
                             false;
+                        ref.read(pickedFileStateProvider.notifier).state = null;
+                        if (!mounted) return;
+                        Navigator.of(context).pop();
+
                         ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
+                                backgroundColor: Colors.green,
                                 content: Text("Posted Successfuly")));
                       } else {
                         ref.read(postInProgressStateProvider.notifier).state =
                             false;
+                        if (!mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Failed")));
+                          const SnackBar(
+                            content: Text(
+                              "Failed",
+                              style: TextStyle(
+                                color: Colors.red,
+                              ),
+                            ),
+                          ),
+                        );
                       }
                     } catch (e) {
                       debugPrint("SOmething went wrong while posting: $e");
