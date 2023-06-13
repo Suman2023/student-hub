@@ -11,8 +11,7 @@ class FeedService {
 
   FeedService() {
     BaseOptions options = BaseOptions(
-      baseUrl:
-          "${dotenv.env['BASE_URL']}/feeds",
+      baseUrl: "${dotenv.env['BASE_URL']}/feeds",
       connectTimeout: const Duration(seconds: 5),
     );
     _dio ??= Dio(options);
@@ -73,7 +72,8 @@ class FeedService {
             FeedsTimeline(
               id: post['id'],
               username: post['username'],
-              first_name: post['first_name'],
+              firstName: post['first_name'],
+              lastName: post['last_name'],
               aspectratio: post['aspectratio'],
               text: post["text"],
               imageurl: post["imageurl"],

@@ -44,6 +44,7 @@ class FeedsScreen extends ConsumerWidget {
             onRefresh: () => ref.refresh(timelineFeedsProvider.future),
             child: timelinefeeds.when(
                 data: (data) {
+                  print("getting data");
                   // debugPrint(data[0].likedByme.toString());
                   return data.isEmpty
                       ? Center(

@@ -274,114 +274,229 @@ class SignUpFlow extends ConsumerWidget {
     final showPwd = ref.watch(showPassStateProvider);
     final emailcontroller = ref.watch(emailControllerProvider);
     final passcontroller = ref.watch(passControllerProvider);
+    final firstNamecontroller = ref.watch(firstNameControllerProvider);
+    final lastNamecontroller = ref.watch(lastNameControllerProvider);
     final emailErr = ref.watch(invalidEmailStateProvider);
     final pwdErr = ref.watch(invalidPwdStateProvider);
+    final firstNameErr = ref.watch(invalidFirstNameStateProvider);
+    final lastNameErr = ref.watch(invalidLastNameStateProvider);
+    final isLoading = ref.watch(authSignLoadingStateProvider);
+    Size size = MediaQuery.of(context).size;
+
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextFormField(
-              controller: emailcontroller,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 18,
-              ),
-              decoration: InputDecoration(
-                hintText: "Enter Email",
-                errorText: emailErr,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(100),
-                ),
-              ),
-              onChanged: emailErr == null
-                  ? null
-                  : (value) =>
-                      ref.read(invalidEmailStateProvider.notifier).state = null,
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              height: size.height * .25,
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextFormField(
-              controller: passcontroller,
-              obscureText: !showPwd,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 18,
-              ),
-              decoration: InputDecoration(
-                hintText: "Enter Password",
-                errorText: pwdErr,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(100),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                controller: emailcontroller,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 18,
                 ),
+                decoration: InputDecoration(
+                  // labelText: "Enter Email",
+                  // alignLabelWithHint: true,
+                  // floatingLabelAlignment: FloatingLabelAlignment.center,
+                  hintText: "Enter Email",
+                  errorText: emailErr,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                ),
+                onChanged: emailErr == null
+                    ? null
+                    : (value) => ref
+                        .read(invalidEmailStateProvider.notifier)
+                        .state = null,
               ),
-              onChanged: pwdErr == null
-                  ? null
-                  : (value) =>
-                      ref.read(invalidPwdStateProvider.notifier).state = null,
             ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Checkbox(
-                value: showPwd,
-                onChanged: (bool? newVal) {
-                  ref.read(showPassStateProvider.notifier).state = newVal!;
-                },
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                controller: passcontroller,
+                obscureText: !showPwd,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 18,
+                ),
+                decoration: InputDecoration(
+                  hintText: "Enter Password",
+                  errorText: pwdErr,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                ),
+                onChanged: pwdErr == null
+                    ? null
+                    : (value) =>
+                        ref.read(invalidPwdStateProvider.notifier).state = null,
               ),
-              const Text("show password"),
-            ],
-          ),
-          ElevatedButton(
-              onPressed: () {
-                final validEmail =
-                    AcountService.validateEmail(emailcontroller.text);
-                final validPass =
-                    AcountService.validatePassword(passcontroller.text);
-                if (!validEmail) {
-                  ref.read(invalidEmailStateProvider.notifier).state =
-                      "Invalid Email";
-                }
-                if (!validPass) {
-                  ref.read(invalidPwdStateProvider.notifier).state =
-                      "Weak Password";
-                }
-                if (validEmail && validPass) {}
-              },
-              child: const Text("Sign Up")),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text("Already have an account? "),
-              GestureDetector(
-                  onTap: () {
-                    pageController.animateToPage(
-                      1,
-                      duration: const Duration(
-                        milliseconds: 400,
-                      ),
-                      curve: Curves.easeInOut,
-                    );
-                    ref.read(emailControllerProvider).clear();
-                    ref.read(passControllerProvider).clear();
-                    ref.read(invalidEmailStateProvider.notifier).state = null;
-                    ref.read(invalidPwdStateProvider.notifier).state = null;
-                    ref.read(showPassStateProvider.notifier).state = false;
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                controller: firstNamecontroller,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 18,
+                ),
+                decoration: InputDecoration(
+                  hintText: "Enter First Name",
+                  errorText: firstNameErr,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                ),
+                onChanged: pwdErr == null
+                    ? null
+                    : (value) => ref
+                        .read(invalidFirstNameStateProvider.notifier)
+                        .state = null,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                controller: lastNamecontroller,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 18,
+                ),
+                decoration: InputDecoration(
+                  hintText: "Enter Last Name",
+                  errorText: lastNameErr,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                ),
+                onChanged: pwdErr == null
+                    ? null
+                    : (value) => ref
+                        .read(invalidLastNameStateProvider.notifier)
+                        .state = null,
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Checkbox(
+                  value: showPwd,
+                  onChanged: (bool? newVal) {
+                    ref.read(showPassStateProvider.notifier).state = newVal!;
                   },
-                  child: const Text(
-                    "SIGN IN",
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold,
+                ),
+                const Text("show password"),
+              ],
+            ),
+            ElevatedButton(
+              onPressed: isLoading
+                  ? null
+                  : () async {
+                      final validEmail =
+                          AcountService.validateEmail(emailcontroller.text);
+                      final validPass =
+                          AcountService.validatePassword(passcontroller.text);
+                      final validFirstName = AcountService.isFirstNameValid(
+                          firstNamecontroller.text);
+                      final validLastName = AcountService.isFirstNameValid(
+                          lastNamecontroller.text);
+                      if (!validEmail) {
+                        ref.read(invalidEmailStateProvider.notifier).state =
+                            "Invalid Email";
+                      }
+                      if (!validPass) {
+                        ref.read(invalidPwdStateProvider.notifier).state =
+                            "Weak Password";
+                      }
+                      if (!validFirstName) {
+                        ref.read(invalidFirstNameStateProvider.notifier).state =
+                            "Invalid First Name\nRequired Minimum 2 character and no special";
+                      }
+                      if (!validLastName) {
+                        ref.read(invalidLastNameStateProvider.notifier).state =
+                            "Invalid Last Name\nRequired Minimum 2 character and no special";
+                      }
+                      if (validEmail &&
+                          validPass &&
+                          validFirstName &&
+                          validLastName) {
+                        ref.read(authSignLoadingStateProvider.notifier).state =
+                            true;
+                        final response = await ref
+                            .read(accountServiceProvider)
+                            .signup(
+                                email: emailcontroller.text,
+                                password: passcontroller.text,
+                                firstName: firstNamecontroller.text,
+                                lastName: lastNamecontroller.text);
+
+                        if (response != null) {
+                          resetState(ref);
+                          ref.invalidate(isAuthenticatedProvider);
+                          pageController.jumpToPage(0);
+                        }
+                        ref.read(authSignLoadingStateProvider.notifier).state =
+                            false;
+                      }
+                    },
+              child: isLoading
+                  ? const SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Text(
+                      "Register",
                     ),
-                  )),
-            ],
-          ),
-        ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text("Already have an account? "),
+                GestureDetector(
+                    onTap: () {
+                      pageController.animateToPage(
+                        1,
+                        duration: const Duration(
+                          milliseconds: 400,
+                        ),
+                        curve: Curves.easeInOut,
+                      );
+                      resetState(ref);
+                    },
+                    child: const Text(
+                      "SIGN IN",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )),
+              ],
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  void resetState(WidgetRef ref) {
+    ref.read(emailControllerProvider).clear();
+    ref.read(passControllerProvider).clear();
+    ref.read(firstNameControllerProvider).clear();
+    ref.read(lastNameControllerProvider).clear();
+    ref.read(invalidEmailStateProvider.notifier).state = null;
+    ref.read(invalidPwdStateProvider.notifier).state = null;
+    ref.read(invalidFirstNameStateProvider.notifier).state = null;
+    ref.read(invalidLastNameStateProvider.notifier).state = null;
+    ref.read(showPassStateProvider.notifier).state = false;
+    ref.read(authSignLoadingStateProvider.notifier).state = false;
   }
 }

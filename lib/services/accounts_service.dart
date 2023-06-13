@@ -9,8 +9,7 @@ class AcountService {
 
   AcountService() {
     BaseOptions options = BaseOptions(
-      baseUrl:
-          "${dotenv.env['BASE_URL']}/accounts",
+      baseUrl: "${dotenv.env['BASE_URL']}/accounts",
       connectTimeout: const Duration(seconds: 5),
     );
     _dio ??= Dio(options);
@@ -54,13 +53,15 @@ class AcountService {
   }
 
   Future<UserAuthResponse?> signup(
-      {required String email, required String password}) async {
+      {required String email, required String password, required String firstName, required String lastName}) async {
     try {
       final result = await _dio!.post(
         "/signup/",
         data: {
           "email": email,
           "password": password,
+          "firstname": firstName,
+          "lastname": lastName
         },
       );
       String csrftoken =
@@ -111,5 +112,15 @@ class AcountService {
         r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$';
     final regex = RegExp(pattern);
     return regex.hasMatch(password);
+  }
+
+  static bool isFirstNameValid(String firstName) {
+    RegExp regex = RegExp(r'^[a-zA-Z0-9]{1,}$');
+    return regex.hasMatch(firstName);
+  }
+
+  static bool isLastNameValid(String lastName) {
+    RegExp regex = RegExp(r'^[a-zA-Z0-9]{1,}$');
+    return regex.hasMatch(lastName);
   }
 }

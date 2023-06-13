@@ -17,11 +17,27 @@ class FeedPostWidget extends StatefulWidget {
 
 class _FeedPostWidgetState extends State<FeedPostWidget> {
   bool hearted = false;
+  int totalLikes = 0;
 
   @override
   void initState() {
+    print(widget.data.totalLike);
     hearted = widget.data.likedByme == 1 ? true : false;
+    totalLikes = widget.data.totalLike;
     super.initState();
+  }
+
+  void heartPost(WidgetRef ref) async {
+    if (hearted) {
+      totalLikes -= 1;
+    } else {
+      totalLikes += 1;
+    }
+    hearted = !hearted;
+    setState(() {});
+    await ref
+        .read(feedServiceProvider)
+        .favouritePost(postid: widget.data.id, favourite: hearted);
   }
 
   @override
@@ -41,7 +57,7 @@ class _FeedPostWidgetState extends State<FeedPostWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.data.first_name,
+                    "${widget.data.firstName} ${widget.data.lastName}",
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -100,23 +116,29 @@ class _FeedPostWidgetState extends State<FeedPostWidget> {
                         children: [
                           Consumer(builder: (context, ref, child) {
                             return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  hearted = !hearted;
-                                  ref.read(feedServiceProvider).favouritePost(
-                                      postid: widget.data.id,
-                                      favourite: hearted);
-                                });
-                              },
-                              child: hearted
-                                  ? const FaIcon(
-                                      FontAwesomeIcons.solidHeart,
-                                      color: Colors.red,
+                                onTap: () async {
+                                  heartPost(ref);
+                                  ref.refresh(timelineFeedsProvider.future);
+                                },
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    hearted
+                                        ? const FaIcon(
+                                            FontAwesomeIcons.solidHeart,
+                                            color: Colors.red,
+                                          )
+                                        : const FaIcon(
+                                            FontAwesomeIcons.heart,
+                                          ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 8.0),
+                                      child: Text(totalLikes > 0
+                                          ? totalLikes.toString()
+                                          : ""),
                                     )
-                                  : const FaIcon(
-                                      FontAwesomeIcons.heart,
-                                    ),
-                            );
+                                  ],
+                                ));
                           }),
                           const FaIcon(
                             FontAwesomeIcons.comment,

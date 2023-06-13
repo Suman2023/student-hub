@@ -2,7 +2,8 @@ class FeedsTimeline {
   FeedsTimeline({
     required this.id,
     required this.username,
-    required this.first_name,
+    required this.firstName,
+    required this.lastName,
     required this.aspectratio,
     required this.text,
     required this.imageurl,
@@ -13,8 +14,8 @@ class FeedsTimeline {
   });
 
   int id;
-  String text, imageurl,username, first_name;
+  String text, imageurl, username, firstName,lastName;
   int totalLike, likedByme;
   DateTime createdAt, updatedAt;
-  double aspectratio; 
+  double aspectratio;
 }
