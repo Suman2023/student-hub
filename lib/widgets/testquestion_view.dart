@@ -1,24 +1,44 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import '../models/test_questions_models.dart';
 import '../providers/test_screen_providers.dart';
 
 class TestQuestionView extends StatefulWidget {
-  const TestQuestionView({super.key});
-
+  const TestQuestionView(
+      {super.key, required this.questiondata, required this.questionindex});
+  final TestQuestionsModel questiondata;
+  final int questionindex;
   @override
   State<TestQuestionView> createState() => _TestQuestionViewState();
 }
 
 class _TestQuestionViewState extends State<TestQuestionView> {
   int selected = -1;
+  List<String> options = ['A', 'B', 'C', 'D'];
+
+  getOption({required int index}) {
+    switch (index) {
+      case 0:
+        return widget.questiondata.optionA;
+      case 1:
+        return widget.questiondata.optionB;
+      case 2:
+        return widget.questiondata.optionC;
+      case 3:
+        return widget.questiondata.optionD;
+      default:
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Question",
+        Text(
+          widget.questiondata.question,
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -27,14 +47,18 @@ class _TestQuestionViewState extends State<TestQuestionView> {
         for (int i = 0; i < 4; i++)
           Consumer(builder: (context, ref, child) {
             return Padding(
-              padding: const EdgeInsets.all(2.0),
+              padding: const EdgeInsets.all(4.0),
               child: GestureDetector(
                 onTap: () {
-                  ref
-                      .read(questionChoicesNotifierProvider.notifier)
-                      .update(1, i.toString());
+                  var previousdata = ref.read(
+                      questionChoicesNotifierProvider)[widget.questionindex];
+                  debugPrint(previousdata);
+                  var updatedData = previousdata == options[i] ? -1 : i;
+                  ref.read(questionChoicesNotifierProvider.notifier).update(
+                      widget.questionindex,
+                      updatedData == -1 ? "-1" : options[updatedData]);
                   setState(() {
-                    selected = i;
+                    selected = updatedData;
                   });
                 },
                 child: Container(
@@ -59,7 +83,7 @@ class _TestQuestionViewState extends State<TestQuestionView> {
                             ),
                           ),
                         ),
-                        const Text("This is an option"),
+                        Text(getOption(index: i)),
                       ],
                     ),
                   ),

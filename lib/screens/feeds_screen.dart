@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -6,11 +8,17 @@ import 'package:student_hub/screens/add_post_screen.dart';
 
 import '../widgets/feed_post.dart';
 
-class FeedsScreen extends ConsumerWidget {
-  const FeedsScreen({super.key, required this.text});
-  final String text;
+class FeedsScreen extends ConsumerStatefulWidget {
+  const FeedsScreen({super.key});
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() => _FeedsScreenState();
+}
+
+class _FeedsScreenState extends ConsumerState<FeedsScreen> {
+  // ScrollController _scrollController = ScrollController();
+  @override
+  Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     final timelinefeeds = ref.watch(timelineFeedsProvider);
     return Scaffold(
@@ -20,8 +28,8 @@ class FeedsScreen extends ConsumerWidget {
         ),
         backgroundColor: Colors.blue[300],
         onPressed: () {
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => const AddPostScreen()));
+          Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const AddPostScreen()));
         },
         child: const FaIcon(FontAwesomeIcons.penNib),
       ),
@@ -41,7 +49,10 @@ class FeedsScreen extends ConsumerWidget {
         },
         // list of images for scrolling
         body: RefreshIndicator(
-            onRefresh: () => ref.refresh(timelineFeedsProvider.future),
+            onRefresh: () async {
+              ref.refresh(timelineFeedsProvider.future);
+              setState(() {});
+            },
             child: timelinefeeds.when(
                 data: (data) {
                   print("getting data");
@@ -66,8 +77,9 @@ class FeedsScreen extends ConsumerWidget {
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 8.0),
                               child: FeedPostWidget(
+                                key: Key(data[index].id.toString()),
                                 width: size.width,
-                                data: data[index]
+                                data: data[index],
                               ),
                             );
                           },

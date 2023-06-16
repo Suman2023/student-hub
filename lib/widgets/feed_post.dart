@@ -18,13 +18,15 @@ class FeedPostWidget extends StatefulWidget {
 class _FeedPostWidgetState extends State<FeedPostWidget> {
   bool hearted = false;
   int totalLikes = 0;
-
+  bool initNotCalled = true;
   @override
   void initState() {
-    print(widget.data.totalLike);
+    super.initState();
+    initNotCalled = false;
+    print("initstate");
+    print(widget.data.text);
     hearted = widget.data.likedByme == 1 ? true : false;
     totalLikes = widget.data.totalLike;
-    super.initState();
   }
 
   void heartPost(WidgetRef ref) async {
