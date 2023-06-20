@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:student_hub/models/feeds_timeline_model.dart';
 
 import '../database/account_db_helper.dart';
+import 'dart:developer' as devtools show log;
 
 class FeedService {
   Dio? _dio;
@@ -44,7 +45,7 @@ class FeedService {
         return true;
       }
     } catch (e) {
-      print("Error, $e");
+      devtools.log(e.toString());
     }
     return false;
   }
@@ -86,7 +87,7 @@ class FeedService {
         }
       }
     } catch (e) {
-      print("Something went wrong in getMyTimeline: $e");
+      devtools.log(e.toString());
     }
 
     return result;

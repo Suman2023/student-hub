@@ -1,9 +1,5 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:student_hub/screens/base_screen.dart';
-import 'package:student_hub/screens/test_screen.dart';
 import 'package:student_hub/widgets/testquestion_view.dart';
 
 import '../providers/test_screen_providers.dart';
@@ -76,31 +72,31 @@ class _TestViewScreenState extends ConsumerState<TestViewScreen> {
                       ref.read(testSubmissionLoadingProvider.notifier).state =
                           false;
                       Navigator.of(context).pop();
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                           content: Text("Test Submitted successfully!")));
                     } else {
                       ref.read(testSubmissionLoadingProvider.notifier).state =
                           false;
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                           content: Text("Failed to Submit. Try again")));
                     }
                   },
             child: submissionLoading
-                ? CircularProgressIndicator()
-                : Text("Submit"),
+                ? const CircularProgressIndicator()
+                : const Text("Submit"),
           )
         ],
       ),
       body: testQuestions.when(
         data: (data) {
           return data == null
-              ? Center(
+              ? const Center(
                   child: Text("No Question found."),
                 )
               : ListView.builder(
                   itemCount: data.questions.length,
                   itemBuilder: (context, index) => Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: TestQuestionView(
                       questionindex: index,
                       questiondata: data.questions[index],

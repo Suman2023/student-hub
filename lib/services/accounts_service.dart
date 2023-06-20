@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:student_hub/models/user_auth_model.dart';
-
 import '../database/account_db_helper.dart';
+import 'dart:developer' as devtools show log;
 
 class AcountService {
   Dio? _dio;
@@ -42,7 +42,7 @@ class AcountService {
         await AccountDbHelper.saveCred(email, password, newcsrf, newsessionid);
       }
     } catch (e) {
-      print("Error in signin $e");
+      devtools.log(e.toString());
     }
     final authuser = UserAuthResponse(
         email: email,
@@ -66,13 +66,13 @@ class AcountService {
       );
       String csrftoken =
           result.headers.value("set-cookie")!.split(";")[0].split("=")[1];
-      print("csrf before signin: $csrftoken");
+      devtools.log(csrftoken.toString());
       UserAuthResponse userAuthResponse =
           await signin(email: email, password: password, csrftoken: csrftoken);
 
       return userAuthResponse;
     } catch (e) {
-      print("Error in Singnup $e");
+      devtools.log(e.toString());
     }
     return null;
   }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:student_hub/providers/accounts_screen_providers.dart';
 import 'package:student_hub/screens/base_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'dart:developer' as devtools show log;
 
 void main() async {
     await dotenv.load(fileName: ".env"); 
@@ -31,7 +32,7 @@ class MyApp extends ConsumerWidget {
       ),
       home: isAuthenticated.when(
         data: (data) {
-          print(data);
+          devtools.log(data.toString());
           return BaseScreen(
             data: data,
           );

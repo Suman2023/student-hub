@@ -39,7 +39,7 @@ class TestService {
             receiveTimeout: const Duration(seconds: 5),
           ),
         );
-        print(response.data);
+        devtools.log(response.data.toString());
         return testModelFromJson(json.encode(response.data));
       }
     } catch (e) {
@@ -66,7 +66,7 @@ class TestService {
             ),
           ),
         );
-        print(response.data);
+        devtools.log(response.data.toString());
         return testQuestionsModelFromJson(json.encode(response.data));
       }
     } catch (e) {

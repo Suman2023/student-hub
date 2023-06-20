@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, unused_result
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -55,7 +55,6 @@ class _FeedsScreenState extends ConsumerState<FeedsScreen> {
             },
             child: timelinefeeds.when(
                 data: (data) {
-                  print("getting data");
                   // debugPrint(data[0].likedByme.toString());
                   return data.isEmpty
                       ? Center(

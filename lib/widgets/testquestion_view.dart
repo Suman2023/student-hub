@@ -34,7 +34,6 @@ class _TestQuestionViewState extends State<TestQuestionView> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

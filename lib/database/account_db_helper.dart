@@ -1,4 +1,5 @@
 import 'package:sqflite/sqflite.dart' as sql;
+import 'dart:developer' as devtools show log;
 
 class AccountDbHelper {
   static Future<void> createTables(sql.Database database) async {
@@ -35,8 +36,6 @@ class AccountDbHelper {
     };
     final id = await db.insert('account', data,
         conflictAlgorithm: sql.ConflictAlgorithm.replace);
-    print("Saved Cred with id: $id");
-
     return id;
   }
 
@@ -55,7 +54,6 @@ class AccountDbHelper {
     Map<String, Object?>? result;
     final db = await AccountDbHelper.db();
     final response = await db.query('account');
-    print("response: $response");
     if (response.isNotEmpty) {
       result = response.last;
     }
@@ -68,7 +66,7 @@ class AccountDbHelper {
       await db.rawDelete("DELETE FROM account");
       return true;
     } catch (e) {
-      print("SOmething went Wrong in clearAccountTable: $e");
+      devtools.log(e.toString());
     }
     return false;
   }
@@ -76,7 +74,7 @@ class AccountDbHelper {
   static getAllCred() async {
     final db = await AccountDbHelper.db();
     final data = await db.rawQuery("SELECT * FROM account");
-    print(data);
+    devtools.log(data.toString());
   }
   // // Update an item by id
   // static Future<int> updateItem(

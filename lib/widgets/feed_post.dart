@@ -1,3 +1,5 @@
+// ignore_for_file: unused_result
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,16 +21,10 @@ class _FeedPostWidgetState extends State<FeedPostWidget> {
   bool hearted = false;
   int totalLikes = 0;
   bool initNotCalled = true;
-
-  var maxHeight;
-
-  var maxWidth;
   @override
   void initState() {
     super.initState();
     initNotCalled = false;
-    print("initstate");
-    print(widget.data.text);
     hearted = widget.data.likedByme == 1 ? true : false;
     totalLikes = widget.data.totalLike;
   }
@@ -162,19 +158,6 @@ class _FeedPostWidgetState extends State<FeedPostWidget> {
           ],
         ),
       ],
-    );
-  }
-
-  Widget _buildErrorWidget() {
-    return const Icon(
-      Icons.error_outline,
-      color: Colors.red,
-    );
-  }
-
-  Widget _buildPlaceholder() {
-    return const Center(
-      child: CircularProgressIndicator(),
     );
   }
 }
