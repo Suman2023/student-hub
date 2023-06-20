@@ -8,7 +8,7 @@ import '../providers/test_screen_providers.dart';
 class TestQuestionView extends StatefulWidget {
   const TestQuestionView(
       {super.key, required this.questiondata, required this.questionindex});
-  final TestQuestionsModel questiondata;
+  final Question questiondata;
   final int questionindex;
   @override
   State<TestQuestionView> createState() => _TestQuestionViewState();
@@ -34,6 +34,7 @@ class _TestQuestionViewState extends State<TestQuestionView> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -46,6 +47,8 @@ class _TestQuestionViewState extends State<TestQuestionView> {
         ),
         for (int i = 0; i < 4; i++)
           Consumer(builder: (context, ref, child) {
+            final currentSelection = ref.watch(questionChoicesNotifierProvider);
+
             return Padding(
               padding: const EdgeInsets.all(4.0),
               child: GestureDetector(
@@ -57,9 +60,9 @@ class _TestQuestionViewState extends State<TestQuestionView> {
                   ref.read(questionChoicesNotifierProvider.notifier).update(
                       widget.questionindex,
                       updatedData == -1 ? "-1" : options[updatedData]);
-                  setState(() {
-                    selected = updatedData;
-                  });
+                  // setState(() {
+                  //   selected = updatedData;
+                  // });
                 },
                 child: Container(
                   width: double.infinity,
@@ -79,11 +82,14 @@ class _TestQuestionViewState extends State<TestQuestionView> {
                             child: CircleAvatar(
                               radius: 10,
                               backgroundColor:
-                                  selected == i ? Colors.amber : Colors.white,
+                                  currentSelection[widget.questionindex] ==
+                                          options[i]
+                                      ? Colors.amber
+                                      : Colors.white,
                             ),
                           ),
                         ),
-                        Text(getOption(index: i)),
+                        Expanded(child: Text(getOption(index: i))),
                       ],
                     ),
                   ),

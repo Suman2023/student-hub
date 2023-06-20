@@ -1,21 +1,43 @@
 import 'dart:convert';
 
-List<TestQuestionsModel> testQuestionsModelFromJson(String str) => List<TestQuestionsModel>.from(json.decode(str).map((x) => TestQuestionsModel.fromJson(x)));
+TestQuestionsModel testQuestionsModelFromJson(String str) => TestQuestionsModel.fromJson(json.decode(str));
 
-String testQuestionsModelToJson(List<TestQuestionsModel> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String testQuestionsModelToJson(TestQuestionsModel data) => json.encode(data.toJson());
 
 class TestQuestionsModel {
     int id;
     String testname;
+    List<Question> questions;
+
+    TestQuestionsModel({
+        required this.id,
+        required this.testname,
+        required this.questions,
+    });
+
+    factory TestQuestionsModel.fromJson(Map<String, dynamic> json) => TestQuestionsModel(
+        id: json["id"],
+        testname: json["testname"],
+        questions: List<Question>.from(json["questions"].map((x) => Question.fromJson(x))),
+    );
+
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "testname": testname,
+        "questions": List<dynamic>.from(questions.map((x) => x.toJson())),
+    };
+}
+
+class Question {
+    int id;
     String question;
     String optionA;
     String optionB;
     String optionC;
     String optionD;
 
-    TestQuestionsModel({
+    Question({
         required this.id,
-        required this.testname,
         required this.question,
         required this.optionA,
         required this.optionB,
@@ -23,9 +45,8 @@ class TestQuestionsModel {
         required this.optionD,
     });
 
-    factory TestQuestionsModel.fromJson(Map<String, dynamic> json) => TestQuestionsModel(
+    factory Question.fromJson(Map<String, dynamic> json) => Question(
         id: json["id"],
-        testname: json["testname"],
         question: json["question"],
         optionA: json["option_a"],
         optionB: json["option_b"],
@@ -35,7 +56,6 @@ class TestQuestionsModel {
 
     Map<String, dynamic> toJson() => {
         "id": id,
-        "testname": testname,
         "question": question,
         "option_a": optionA,
         "option_b": optionB,

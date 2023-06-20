@@ -34,10 +34,12 @@ final questionChoicesNotifierProvider =
 
 final testServiceProvider = Provider<TestService>((ref) => TestService());
 
+final testSubmissionLoadingProvider = StateProvider<bool>((ref)=>false);
+
 final fetchAllQuestionsProvider =
-    FutureProvider<List<TestQuestionsModel>>((ref) async {
+    FutureProvider.family<TestQuestionsModel?,int>((ref,testid) async {
   final testService = ref.read(testServiceProvider);
-  return testService.getAllQuestions(testid: 1);
+  return testService.getAllQuestions(testid: testid);
 });
 
 final fetchAllTestsProvider = FutureProvider<List<TestModel>>((ref) async {

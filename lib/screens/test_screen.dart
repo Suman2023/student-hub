@@ -37,6 +37,7 @@ class TestScreen extends ConsumerWidget {
                           MaterialPageRoute(
                             builder: (ctx) => TestViewScreen(
                               testName: data[index].testname,
+                              testid: data[index].id,
                             ),
                           ),
                         );

@@ -19,6 +19,10 @@ class _FeedPostWidgetState extends State<FeedPostWidget> {
   bool hearted = false;
   int totalLikes = 0;
   bool initNotCalled = true;
+
+  var maxHeight;
+
+  var maxWidth;
   @override
   void initState() {
     super.initState();
@@ -158,6 +162,19 @@ class _FeedPostWidgetState extends State<FeedPostWidget> {
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildErrorWidget() {
+    return const Icon(
+      Icons.error_outline,
+      color: Colors.red,
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return const Center(
+      child: CircularProgressIndicator(),
     );
   }
 }

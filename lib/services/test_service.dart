@@ -2,7 +2,13 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:student_hub/models/test_questions_models.dart';
+import '../database/account_db_helper.dart';
 import '../models/test_models.dart';
+import 'dart:developer' as devtools show log;
+
+extension Log on Object {
+  log() => devtools.log(toString());
+}
 
 class TestService {
   Dio? _dio;
@@ -16,60 +22,86 @@ class TestService {
   }
 
   Future<List<TestModel>> getAllTests() async {
-    var tests = [
-      {
-        "id": 0,
-        "testname": "testname 0",
-        "question_count": 3,
-      },
-      {
-        "id": 0,
-        "testname": "testname 0",
-        "question_count": 3,
-      },
-      {
-        "id": 0,
-        "testname": "testname 0",
-        "question_count": 3,
-      }
-    ];
+    List<TestModel> result = [];
+    try {
+      final authdetails = await AccountDbHelper.getCurrentUserCred();
 
-    return testModelFromJson(json.encode(tests));
+      if (authdetails != null) {
+        final csrftoken = authdetails["csrftoken"],
+            sessionid = authdetails["sessionid"];
+        final response = await _dio!.get(
+          "/getalltests",
+          options: Options(
+            headers: {
+              'Cookie': "csrftoken=$csrftoken; sessionid=$sessionid",
+              'X-CSRFToken': csrftoken
+            },
+            receiveTimeout: const Duration(seconds: 5),
+          ),
+        );
+        print(response.data);
+        return testModelFromJson(json.encode(response.data));
+      }
+    } catch (e) {
+      e.log();
+    }
+    return result;
   }
 
-  Future<List<TestQuestionsModel>> getAllQuestions(
-      {required int testid}) async {
-    final questions = [
-      {
-        "id": 0,
-        "testname": "testname 0",
-        "question": "question 0",
-        "option_a": "option_a",
-        "option_b": "option_b",
-        "option_c": "option_c",
-        "option_d": "option_d"
-      },
-      {
-        "id": 1,
-        "testname": "testname 1",
-        "question": "question 1",
-        "option_a": "option_a",
-        "option_b": "option_b",
-        "option_c": "option_c",
-        "option_d": "option_d"
-      },
-      {
-        "id": 2,
-        "testname": "testname 2",
-        "question": "question 2",
-        "option_a": "option_a",
-        "option_b": "option_b",
-        "option_c": "option_c",
-        "option_d": "option_d"
+  Future<TestQuestionsModel?> getAllQuestions({required int testid}) async {
+    try {
+      final authdetails = await AccountDbHelper.getCurrentUserCred();
+      if (authdetails != null) {
+        final csrftoken = authdetails["csrftoken"],
+            sessionid = authdetails["sessionid"];
+        final response = await _dio!.get(
+          "/getallquestions/$testid",
+          options: Options(
+            headers: {
+              'Cookie': "csrftoken=$csrftoken; sessionid=$sessionid",
+              'X-CSRFToken': csrftoken,
+            },
+            receiveTimeout: const Duration(
+              seconds: 5,
+            ),
+          ),
+        );
+        print(response.data);
+        return testQuestionsModelFromJson(json.encode(response.data));
       }
-    ];
-    // await _dio!.get("/getallquestions");
+    } catch (e) {
+      e.log();
+    }
+    return null;
+  }
 
-    return testQuestionsModelFromJson(json.encode(questions));
+  Future<bool> submitTest({required List<String> ansList, required int testid}) async {
+    bool success = false;
+    try {
+      final authdetails = await AccountDbHelper.getCurrentUserCred();
+
+      if (authdetails != null) {
+        final csrftoken = authdetails["csrftoken"],
+            sessionid = authdetails["sessionid"];
+        final response = await _dio!.post(
+          "/submit",
+          data: {"answers": ansList, "testid": testid},
+          options: Options(
+            headers: {
+              'Cookie': "csrftoken=$csrftoken; sessionid=$sessionid",
+              'X-CSRFToken': csrftoken
+            },
+            receiveTimeout: const Duration(seconds: 5),
+          ),
+        );
+        success = response.statusCode != null && response.statusCode! < 300 ? true : false;
+        if(!success){
+          throw response.data;
+        }
+      }
+    } catch (e) {
+      e.log();
+    }
+    return success;
   }
 }

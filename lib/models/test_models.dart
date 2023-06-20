@@ -18,12 +18,12 @@ class TestModel {
 
   factory TestModel.fromJson(Map<String, dynamic> json) => TestModel(
       id: json["id"],
-      testname: json["testname"],
-      questionCount: json["question_count"]);
+      testname: json["name"],
+      questionCount: json["total_question"]);
 
   Map<String, dynamic> toJson() => {
         "id": id,
-        "testname": testname,
-        "question_count": questionCount,
+        "name": testname,
+        "total_question": questionCount,
       };
 }
