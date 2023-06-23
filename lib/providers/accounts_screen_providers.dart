@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:student_hub/services/feedback_service.dart';
 
 import '../database/account_db_helper.dart';
 import '../services/accounts_service.dart';
@@ -31,7 +34,7 @@ final invalidFirstNameStateProvider = StateProvider<String?>((ref) => null);
 final invalidLastNameStateProvider = StateProvider<String?>((ref) => null);
 
 final isAuthenticatedProvider =
-    FutureProvider<Map<String, dynamic>?>((ref) async {
+    FutureProvider.autoDispose<Map<String, dynamic>?>((ref) async {
   final authservice = ref.read(accountServiceProvider);
   final data = await authservice.isAuthenticated();
   if (data != null) {
@@ -41,3 +44,10 @@ final isAuthenticatedProvider =
 });
 
 final isLoggedInStateProvider = StateProvider<bool>((ref) => false);
+
+final feedbackFileProvider = StateProvider<File?>((ref) => null);
+final feedbackTextProvider =
+    StateProvider<TextEditingController>((ref) => TextEditingController());
+final feedbackServiceProvider =
+    Provider<FeedbackService>((ref) => FeedbackService());
+final feedbackLoadingProvider = StateProvider<bool>((ref) => false);

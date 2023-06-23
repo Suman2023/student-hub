@@ -1,7 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:student_hub/providers/accounts_screen_providers.dart';
-
+import '../database/account_db_helper.dart';
 import '../services/accounts_service.dart';
 
 class AccountScreen extends ConsumerStatefulWidget {
@@ -54,6 +58,12 @@ class AuthorizedScreen extends ConsumerStatefulWidget {
 }
 
 class _AuthorizedScreenState extends ConsumerState<AuthorizedScreen> {
+  final _picker = ImagePicker();
+  void clearCache() async {
+    Directory cacheDir = await getTemporaryDirectory();
+    cacheDir.deleteSync(recursive: true);
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -94,6 +104,35 @@ class _AuthorizedScreenState extends ConsumerState<AuthorizedScreen> {
                         widget.pageController.jumpToPage(1);
                       },
                     ),
+
+                    ListTile(
+                      // tileColor: Colors.red[400],
+                      leading: const Icon(
+                        Icons.feedback_outlined,
+                      ),
+                      title: const Text(
+                        "Provide Feedback",
+                      ),
+                      onTap: () async {
+                        debugPrint("clicked feedback");
+                        _showFeedbackModalSheet(context).then((value) => null);
+                      },
+                    ),
+
+                    // TODO: Remove this in prod
+                    // ListTile(
+                    //   tileColor: Colors.redAccent,
+                    //   title: Text("Clear Account DB"),
+                    //   onTap: () async {
+                    //     await AccountDbHelper.clearAccountTable();
+                    //     ref.read(isLoggedInStateProvider.notifier).state =
+                    //         false;
+
+                    //     setState(() {
+                    //       ref.refresh(isAuthenticatedProvider.future);
+                    //     });
+                    //   },
+                    // ),
                   ],
                 ))
               ],
@@ -107,6 +146,164 @@ class _AuthorizedScreenState extends ConsumerState<AuthorizedScreen> {
           child: CircularProgressIndicator(),
         ),
       )),
+    );
+  }
+
+  Future<dynamic> _showFeedbackModalSheet(BuildContext context) {
+    return showModalBottomSheet(
+      context: context,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 1.0,
+        expand: false,
+        builder: (BuildContext context, ScrollController scrollController) {
+          return Consumer(builder: (context, ref, child) {
+            final feedbackFile = ref.watch(feedbackFileProvider);
+            final feedbackTextController = ref.watch(feedbackTextProvider);
+            final isLoading = ref.watch(feedbackLoadingProvider);
+            return Container(
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(8.0, 1.0, 8.0, 8.0),
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 10,
+                      width: double.infinity,
+                      // child: Center(
+                      //   child: Container(
+                      //       height: 5,
+                      //       width: 25,
+                      //       color: Colors.black),
+                      // ),
+                    ),
+                    Expanded(
+                      child: ListView(
+                        shrinkWrap: true,
+                        children: [
+                          TextFormField(
+                            controller: feedbackTextController,
+                            minLines: 1,
+                            maxLines: 3,
+                            decoration: InputDecoration(
+                                labelText: "Enter Feedback",
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                suffixIcon: IconButton(
+                                    onPressed: () {
+                                      ref
+                                          .read(feedbackTextProvider.notifier)
+                                          .state
+                                          .clear();
+                                    },
+                                    icon: const Icon(Icons.clear_outlined))),
+                          ),
+                          Visibility(
+                            visible: feedbackFile != null,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    feedbackFile != null
+                                        ? basename(feedbackFile.path) * 10
+                                        : "",
+                                    style: const TextStyle(
+                                      color: Colors.red,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    ref
+                                        .read(feedbackFileProvider.notifier)
+                                        .state = null;
+                                  },
+                                  child: const Text(
+                                    'reset',
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              final file = await _picker.pickImage(
+                                source: ImageSource.gallery,
+                              );
+                              if (file != null) {
+                                ref.read(feedbackFileProvider.notifier).state =
+                                    File(
+                                  file.path,
+                                );
+                              }
+                            },
+                            child: const Text(
+                              "Add screenshot",
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: isLoading
+                                ? null
+                                : () async {
+                                    ref
+                                        .read(feedbackLoadingProvider.notifier)
+                                        .state = true;
+                                    final success = await ref
+                                        .read(feedbackServiceProvider)
+                                        .sendFeedback(
+                                          text: feedbackTextController.text,
+                                          filePath: feedbackFile?.path,
+                                        );
+                                    ref
+                                        .read(feedbackLoadingProvider.notifier)
+                                        .state = false;
+                                    if (!mounted) return;
+                                    if (success) {
+                                      ref
+                                          .read(feedbackFileProvider.notifier)
+                                          .state = null;
+                                      ref.read(feedbackTextProvider).clear();
+                                      Navigator.of(context).pop();
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          backgroundColor: Colors.green[200],
+                                          content: const Text(
+                                            "Thank You for the feedback",
+                                          ),
+                                        ),
+                                      );
+                                    } else if (!success) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          backgroundColor: Colors.red[200],
+                                          content: const Text(
+                                            "Something went wrong. Please try Again",
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
+                            child: isLoading
+                                ? const Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : const Text("Submit"),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          });
+        },
+      ),
     );
   }
 }
