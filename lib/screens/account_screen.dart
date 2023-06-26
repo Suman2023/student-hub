@@ -5,7 +5,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:student_hub/providers/accounts_screen_providers.dart';
-import '../database/account_db_helper.dart';
 import '../services/accounts_service.dart';
 
 class AccountScreen extends ConsumerStatefulWidget {

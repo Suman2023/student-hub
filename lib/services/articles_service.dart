@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import '../models/articles_models.dart';
 
 class ArticlesService {
   Dio? _dio;
@@ -12,11 +16,10 @@ class ArticlesService {
     _dio ??= Dio(options);
   }
 
-  Future<Map<String,dynamic>?> getArticles() async{
+  Future<List<ArticlesModel>?> getArticles() async {
     final response = await _dio!.get("/getallarticles");
-    if (response.statusCode != null && response.statusCode! < 300){
-      // need to make it a object
-      return response.data;
+    if (response.statusCode != null && response.statusCode! < 300) {
+      return articlesModelFromJson(json.encode(response.data));
     }
     return null;
   }

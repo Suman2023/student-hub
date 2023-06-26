@@ -26,7 +26,7 @@ class _BaseScreenState extends ConsumerState<BaseScreen> {
   List<Widget> getPages(int accountPage) {
     return [
       const FeedsScreen(),
-      ArticlesScreen(),
+      const ArticlesScreen(),
       const VideoesScreen(),
       const TestScreen(),
       const AccountScreen(),
